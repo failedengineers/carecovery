@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareCovery: CRM for doctors and clinics</title>
+<meta name="description" content="Patients, appointments, clinical records, billing and inventory in one workspace. Built for individual doctors and multi-doctor clinics.">
+<meta property="og:title" content="CareCovery: CRM for doctors and clinics">
+<meta property="og:description" content="Every doctor keeps their own patient panel. The clinic manager runs the front desk and the books.">
+<meta property="og:url" content="https://carecovery.ilovelabfile.in/">
+<meta name="theme-color" content="#1B2350">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%231B2350'/%3E%3Cpath d='M26 12h12v14h14v12H38v14H26V38H12V26h14z' fill='%23EAF0E3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF0E3;--paper:#F6F8F0;--navy:#1B2350;--red:#B8262B;--ink:#2B3158;--line:#1B2350;
+--d:'Anton','Impact','Arial Narrow',sans-serif;--b:'Hind','Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.6 var(--b)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+h1,h2,h3{font-family:var(--d);font-weight:400;color:var(--navy);line-height:1.02;letter-spacing:.2px}
+h1{font-size:clamp(46px,8vw,104px)}
+h2{font-size:clamp(34px,5vw,58px);margin-bottom:18px}
+h3{font-size:26px;margin-bottom:6px}
+p{max-width:62ch}
+/* header */
+header{border-bottom:2px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.bar{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font:400 30px/1 var(--d);text-decoration:none;color:var(--navy);display:flex;align-items:center;gap:8px}
+.logo i{color:var(--red);font-style:normal}
+.logo svg{width:24px;height:24px}
+nav{display:flex;align-items:center;gap:26px;font-weight:500}
+nav a{text-decoration:none}
+nav a:hover{text-decoration:underline;text-underline-offset:5px}
+.btn{display:inline-block;padding:12px 22px;border:2px solid var(--line);font:600 17px var(--b);text-decoration:none;background:transparent;color:var(--navy);cursor:pointer}
+.btn.solid{background:var(--navy);color:var(--bg);box-shadow:5px 5px 0 var(--red);transition:transform .12s,box-shadow .12s}
+.btn.solid:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--red)}
+.btn:not(.solid):hover{background:var(--navy);color:var(--bg)}
+/* hero */
+.hero{padding:70px 0 90px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.hero p.lead{font-size:21px;margin:26px 0 32px}
+.cta{display:flex;gap:16px;flex-wrap:wrap}
+.note{margin-top:18px;font-size:15px}
+/* ledger card */
+.ledger{background:var(--paper);border:2px solid var(--line);box-shadow:12px 12px 0 var(--navy);position:relative;padding:20px 22px 12px 54px;transform:rotate(1.2deg);animation:settle .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes settle{from{transform:rotate(7deg) translateY(-30px);opacity:0}}
+.ledger:before{content:"";position:absolute;left:34px;top:0;bottom:0;border-left:3px solid var(--red)}
+.ledger header{all:unset;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--line);padding-bottom:8px;margin-bottom:4px}
+.ledger h3{font-size:30px;margin:0}
+.ledger small{font-size:14px}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid rgba(27,35,80,.3);font-size:16px}
+.row b{font:400 24px var(--d);color:var(--navy)}
+.row span{font-size:14px;display:block;opacity:.8}
+.tag{font-weight:600;font-size:13px;border:2px solid var(--navy);padding:1px 9px;white-space:nowrap}
+.tag.now{background:var(--red);border-color:var(--red);color:#fff}
+.tag.done{background:var(--navy);color:var(--bg)}
+/* sections */
+section{padding:84px 0;border-top:2px solid var(--line)}
+.intro{max-width:700px;margin-bottom:46px}
+.index{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--line);background:var(--paper)}
+.index div{padding:26px 28px;border-bottom:2px solid var(--line)}
+.index div:nth-child(odd){border-right:2px solid var(--line)}
+.index div:nth-last-child(-n+2){border-bottom:0}
+.index p{font-size:17px}
+.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid var(--line)}
+.roles div{padding:24px 22px;border-right:2px solid var(--line);background:var(--paper)}
+.roles div:last-child{border-right:0}
+.roles p{font-size:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.panel{border:2px solid var(--line);padding:30px;background:var(--paper)}
+.panel.dark{background:var(--navy);color:var(--bg);box-shadow:10px 10px 0 var(--red)}
+.panel.dark h3{color:var(--bg)}
+.panel ul{padding-left:20px;margin-top:12px}
+.demo{background:var(--navy);color:var(--bg);border-top:0}
+.demo h2{color:var(--bg)}
+.demo .btn.solid{background:var(--bg);color:var(--navy)}
+.demo .btn:not(.solid){border-color:var(--bg);color:var(--bg)}
+.demo .btn:not(.solid):hover{background:var(--bg);color:var(--navy)}
+footer{padding:36px 0;border-top:2px solid var(--line);font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media(max-width:900px){
+.hero,.two{grid-template-columns:1fr}.hero{padding-top:44px}
+.index{grid-template-columns:1fr}.index div{border-right:0!important;border-bottom:2px solid var(--line)!important}.index div:last-child{border-bottom:0!important}
+.roles{grid-template-columns:1fr 1fr}.roles div:nth-child(2){border-right:0}.roles div:nth-child(-n+2){border-bottom:2px solid var(--line)}
+nav a:not(.btn){display:none}}
+@media(max-width:520px){.roles{grid-template-columns:1fr}.roles div{border-right:0!important;border-bottom:2px solid var(--line)}.roles div:last-child{border-bottom:0}}
+@media(prefers-reduced-motion:reduce){.ledger{animation:none}.btn.solid{transition:none}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap bar">
+<a class="logo" href="/" aria-label="CareCovery home"><svg viewBox="0 0 24 24"><path d="M9 1h6v8h8v6h-8v8H9v-8H1V9h8z" fill="#B8262B"/></svg>CARE<i>COVERY</i></a>
+<nav>
+<a href="#modules">What's inside</a><a href="#roles">Roles</a><a href="#workspaces">Workspaces</a><a href="#trial">Free trial</a>
+<a class="btn" href="/accounts/login/">Log in</a>
+</nav>
+</div>
+</header>
+
+<main>
+<div class="wrap hero">
+<div>
+<h1>Every patient. Every doctor. One calm clinic.</h1>
+<p class="lead">CareCovery keeps patient records, appointments, billing and stock in one workspace. Each doctor sees only their own patients. The clinic manager runs the front desk and the books.</p>
+<div class="cta">
+<a class="btn solid" href="/accounts/login/">Try the live demo</a>
+<a class="btn" href="https://wa.me/919717324135?text=Hi%2C%20I%27d%20like%20a%20CareCovery%20trial">Ask for a free trial</a>
+</div>
+<p class="note">The demo is pre-filled. Pick a doctor or the clinic manager and you're in. All data is fictional.</p>
+</div>
+
+<aside class="ledger" aria-label="Example waiting queue">
+<header><h3>Today's queue</h3><small>Northstar Family Clinic</small></header>
+<div class="row"><b>1</b><div>Anita Rao<span>Dr. Mehta, Cardiology</span></div><em class="tag done">Seen</em></div>
+<div class="row"><b>2</b><div>Rohan Verma<span>Dr. Iyer, Dermatology</span></div><em class="tag now">In consult</em></div>
+<div class="row"><b>3</b><div>Sunita Das<span>Dr. Mehta, Cardiology</span></div><em class="tag">Waiting</em></div>
+<div class="row"><b>4</b><div>Kabir Shah<span>Dr. Iyer, Dermatology</span></div><em class="tag">Waiting</em></div>
+<div class="row"><b>5</b><div>Meera Nair<span>Follow-up, Dr. Mehta</span></div><em class="tag">Checked in</em></div>
+</aside>
+</div>
+
+<section id="modules">
+<div class="wrap">
+<div class="intro"><h2>Everything the front desk and the consulting room need</h2>
+<p>No juggling registers, spreadsheets and billing books. Each task has a place, and every change is logged.</p></div>
+<div class="index">
+<div><h3>Patient registry</h3><p>MRN, demographics, emergency contacts, allergies, chronic conditions, tags and a full timeline. Bring in old lists with CSV import.</p></div>
+<div><h3>Appointments and queue</h3><p>Schedule visits, move them through a status workflow and watch the daily waiting queue. Overlapping bookings are blocked.</p></div>
+<div><h3>Clinical records</h3><p>Symptoms, examination, diagnoses, treatment plans, vitals, prescriptions and follow-up dates, kept with the doctor who saw the patient.</p></div>
+<div><h3>Billing and payments</h3><p>Invoices with discounts, tax and partial payments. Outstanding balances stay visible until they're settled.</p></div>
+<div><h3>Expenses and inventory</h3><p>Log clinic expenses, track stock, see low-stock items and review every stock movement and adjustment.</p></div>
+<div><h3>Reports and activity history</h3><p>Role-scoped reports and CSV exports, in-app notifications and an audit trail of who changed what.</p></div>
+</div>
+</div>
+</section>
+
+<section id="roles">
+<div class="wrap">
+<div class="intro"><h2>Everyone sees what their job needs</h2>
+<p>Four workspace roles, each with its own limits. Billing staff never open clinical notes. Doctors never browse another doctor's patients.</p></div>
+<div class="roles">
+<div><h3>Clinic Manager</h3><p>Runs administration and reception from one account: patients, appointments, queue, team, invoices, expenses, inventory and reports.</p></div>
+<div><h3>Doctor</h3><p>Sees their own patients, appointments, records, prescriptions, follow-ups and invoices.</p></div>
+<div><h3>Nurse</h3><p>Supports patient and appointment work and views non-sensitive records. No access to billing ledgers.</p></div>
+<div><h3>Billing Staff</h3><p>Handles invoices, payments and expenses. Clinical notes stay out of reach.</p></div>
+</div>
+</div>
+</section>
+
+<section id="workspaces">
+<div class="wrap">
+<div class="intro"><h2>A workspace of your own, however big your practice</h2></div>
+<div class="two">
+<div class="panel"><h3>Individual doctor</h3><p>One doctor account with its own private practice workspace and patient panel. Set up in minutes, no team to manage.</p></div>
+<div class="panel dark"><h3>Clinic</h3><p>One workspace for the whole clinic. Every doctor keeps a separate patient panel and clinical history, while the clinic manager handles the desk and the accounts.</p>
+<ul><li>Separate data for every workspace</li><li>Team accounts with role-based access</li><li>Structured records only, no file uploads</li></ul></div>
+</div>
+</div>
+</section>
+
+<section id="trial">
+<div class="wrap two">
+<div><h2>Start with a free trial</h2>
+<p>We set up your workspace and choose the trial length with you, from a single day to as long as you need to be sure. Move to a paid licence later without losing a single record.</p></div>
+<div class="panel"><h3>Questions or a setup call?</h3><p>Message us on WhatsApp or call, and we'll create your workspace.</p>
+<p style="margin-top:14px"><a class="btn solid" href="https://wa.me/919717324135?text=Hi%2C%20I%27d%20like%20a%20CareCovery%20trial">WhatsApp +91 97173 24135</a></p>
+<p style="margin-top:14px"><a href="tel:+919717324135">Call +91 97173 24135</a></p></div>
+</div>
+</section>
+
+<section class="demo">
+<div class="wrap">
+<h2>See it with real-looking data in 10 seconds</h2>
+<p style="margin-bottom:28px">The login page is pre-filled with demo accounts for a clinic manager and doctors. Click around, add a patient, book an appointment, raise an invoice.</p>
+<a class="btn solid" href="/accounts/login/">Open the live demo</a>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="wrap"><span>&copy; CareCovery. Demo accounts use fictional data only.</span><span><a href="https://wa.me/919717324135">WhatsApp</a> &nbsp; <a href="/accounts/login/">Log in</a></span></div>
+</footer>
+</body>
+</html>

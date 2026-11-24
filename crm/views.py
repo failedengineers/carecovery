@@ -23,6 +23,14 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.cache import never_cache
 from django.utils.http import url_has_allowed_host_and_scheme
 
+
+from django.shortcuts import render, redirect
+
+def landing(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'landing.html')
+
 from .forms import (
     PatientForm, AppointmentForm, MedicalRecordForm, FollowUpForm,
     InvoiceForm, PaymentForm, OrganizationForm, StaffUserForm,

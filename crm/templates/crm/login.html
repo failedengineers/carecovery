@@ -1,6 +1,208 @@
+
 {% extends 'crm/base.html' %}
 {% block title %}Sign in{% endblock %}
+
 {% block auth_content %}
-<div class="login-page"><div class="login-showcase"><a class="brand brand-light" href="#"><span class="brand-mark"><i>c</i></span><span class="brand-word">CareCovery<span class="brand-dot">.</span><small>CARE MANAGEMENT</small></span></a><div class="showcase-copy"><span class="eyebrow light-eyebrow">CARE, CONNECTED</span><h1>More time for<br><em>what matters.</em></h1><p>Your clinic, your doctors, your patients — thoughtfully brought together in one calm workspace.</p><div class="showcase-stats"><div><strong>01</strong><span>One connected<br>workspace</span></div><div><strong>02</strong><span>Care that feels<br>personal</span></div><div><strong>03</strong><span>Clarity at every<br>step</span></div></div></div><div class="showcase-foot">A simpler way to run modern healthcare.</div></div>
-<div class="login-panel"><div class="login-box"><span class="eyebrow">WELCOME BACK</span><h2>Sign in to CareCovery</h2><p class="muted">Enter your details to continue to your workspace.</p>{% if messages %}{% for message in messages %}<div class="message error">{{ message }}</div>{% endfor %}{% endif %}<form method="post">{% csrf_token %}<label>Username</label><input class="field-input" name="username" autocomplete="username" required autofocus placeholder="Your username"><label>Password</label><input class="field-input" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"><button class="btn btn-primary btn-full" type="submit">Sign in <span>→</span></button></form><p class="login-legal"><a href="{% url 'password_reset' %}">Forgot your password?</a></p><div class="login-note"><span>⌑</span> Your workspace uses role-based access and clinic-level data separation.</div><p class="login-legal">Demo accounts are listed in the project README. Change all demo passwords before using real patient information.</p></div></div></div>
+<div class="login-page">
+
+    <div class="login-showcase">
+        <a class="brand brand-light" href="/">
+            <span class="brand-mark"><i>c</i></span>
+            <span class="brand-word">
+                CareCovery<span class="brand-dot">.</span>
+                <small>CARE MANAGEMENT</small>
+            </span>
+        </a>
+
+        <div class="showcase-copy">
+            <span class="eyebrow light-eyebrow">CARE, CONNECTED</span>
+            <h1>More time for<br><em>what matters.</em></h1>
+            <p>Your clinic, your doctors, your patients — thoughtfully brought together in one calm workspace.</p>
+
+            <div class="showcase-stats">
+                <div><strong>01</strong><span>One connected<br>workspace</span></div>
+                <div><strong>02</strong><span>Care that feels<br>personal</span></div>
+                <div><strong>03</strong><span>Clarity at every<br>step</span></div>
+            </div>
+        </div>
+
+        <div class="showcase-foot">
+            A simpler way to run modern healthcare.
+        </div>
+    </div>
+
+    <div class="login-panel">
+        <div class="login-box">
+
+            <span class="eyebrow">WELCOME TO CARECOVERY</span>
+            <h2>Sign in to CareCovery</h2>
+            <p class="muted">Choose a demo account or enter your credentials.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message error">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- DEMO ACCOUNT SELECTOR -->
+            <div class="demo-accounts">
+                <p class="demo-heading">TRY THE LIVE DEMO</p>
+
+                <button type="button"
+                        class="demo-account-btn"
+                        onclick="fillDemo('clinicadmin', 'ClinicAdmin@2026')">
+                    <span>
+                        <strong>Clinic Manager</strong>
+                        <small>Full clinic management access</small>
+                    </span>
+                    <span class="demo-arrow">→</span>
+                </button>
+
+                <button type="button"
+                        class="demo-account-btn"
+                        onclick="fillDemo('doctor1', 'DoctorOne@2026')">
+                    <span>
+                        <strong>Doctor 1</strong>
+                        <small>Doctor workspace access</small>
+                    </span>
+                    <span class="demo-arrow">→</span>
+                </button>
+            </div>
+
+            <div class="demo-divider">
+                <span>OR SIGN IN MANUALLY</span>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <label for="username">Username</label>
+                <input
+                    class="field-input"
+                    id="username"
+                    name="username"
+                    autocomplete="username"
+                    required
+                    autofocus
+                    placeholder="Your username"
+                >
+
+                <label for="password">Password</label>
+                <input
+                    class="field-input"
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                    placeholder="Enter your password"
+                >
+
+                <button class="btn btn-primary btn-full" type="submit">
+                    Sign in <span>→</span>
+                </button>
+            </form>
+
+            <p class="login-legal">
+                <a href="{% url 'password_reset' %}">Forgot your password?</a>
+            </p>
+
+            <div class="login-note">
+                <span>⌑</span>
+                Your workspace uses role-based access and clinic-level data separation.
+            </div>
+
+            <p class="login-legal">
+                Demo accounts use fictional data only. Do not enter real patient information.
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.demo-accounts {
+    margin: 25px 0;
+}
+
+.demo-heading {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    margin-bottom: 12px;
+    color: #777;
+}
+
+.demo-account-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    padding: 13px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #dedede;
+    border-radius: 9px;
+    background: #fff;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    transition: border-color .2s, background .2s;
+}
+
+.demo-account-btn:hover {
+    border-color: #1B2350;
+    background: #f4f5fa;
+}
+
+.demo-account-btn strong {
+    display: block;
+    font-size: 14px;
+}
+
+.demo-account-btn small {
+    display: block;
+    margin-top: 3px;
+    color: #777;
+    font-size: 12px;
+}
+
+.demo-arrow {
+    font-size: 20px;
+    color: #1B2350;
+}
+
+.demo-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0;
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.demo-divider::before,
+.demo-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: #ddd;
+}
+
+.demo-account-btn:focus-visible {
+    outline: 3px solid #B8262B;
+    outline-offset: 3px;
+}
+</style>
+
+<script>
+function fillDemo(username, password) {
+    document.getElementById("username").value = username;
+    document.getElementById("password").value = password;
+
+    document.getElementById("username").focus();
+}
+</script>
+
 {% endblock %}
