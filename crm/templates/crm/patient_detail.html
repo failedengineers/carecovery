@@ -1,0 +1,49 @@
+{% extends 'crm/base.html' %}
+{% block title %}{{ patient.full_name }}{% endblock %}
+{% block breadcrumb %}Patients / {{ patient.full_name }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><span class="eyebrow">PATIENT PROFILE · {{ patient.mrn }}</span><h1>{{ patient.full_name }}</h1><p>{% if patient.date_of_birth %}{{ patient.age }} years{% else %}Age not recorded{% endif %} · {{ patient.get_gender_display|default:'Gender not recorded' }} · Added {{ patient.created_at|date:'d M Y' }}</p></div>
+  <div class="heading-actions">
+    {% if user.role == 'clinic_manager' or user.role == 'doctor' or user.role == 'clinic_manager' %}<a href="{% url 'patient_edit' patient.pk %}" class="btn btn-ghost">Edit patient</a>{% endif %}
+    {% if user.role == 'clinic_manager' or user.role == 'doctor' or user.role == 'clinic_manager' %}<a href="{% url 'appointment_create' %}" class="btn btn-primary">＋ Book appointment</a>{% endif %}
+    {% if user.role == 'clinic_manager' or user.role == 'doctor' %}<a href="{% url 'record_create' %}" class="btn btn-ghost">＋ Clinical note</a>{% endif %}
+  </div>
+</div>
+<div class="patient-hero-grid">
+  <div class="panel patient-overview">
+    <div class="patient-avatar-large">{{ patient.first_name|slice:':1'|upper }}{{ patient.last_name|slice:':1'|upper }}</div>
+    <div class="patient-identity"><h2>{{ patient.full_name }}</h2><span class="mono">{{ patient.mrn }}</span><div class="tag-list">{% if patient.tags %}<span class="tag-chip">{{ patient.tags }}</span>{% else %}<span class="muted">No tags added</span>{% endif %}</div></div>
+    <div class="patient-facts">
+      <div><small>PHONE</small><strong>{{ patient.phone|default:'—' }}</strong></div>
+      <div><small>EMAIL</small><strong>{{ patient.email|default:'—' }}</strong></div>
+      {% if can_view_clinical_snapshot %}<div><small>BLOOD GROUP</small><strong>{{ patient.blood_group|default:'—' }}</strong></div>{% endif %}
+      <div><small>PRIMARY DOCTOR</small><strong>{% if patient.primary_doctor %}Dr. {{ patient.primary_doctor.user.get_full_name }}{% else %}Unassigned{% endif %}</strong></div>
+    </div>
+  </div>
+  {% if can_view_clinical_snapshot %}
+  <div class="panel clinical-alerts">
+    <div class="panel-heading"><div><h3>Clinical snapshot</h3><p>Important information to review before care.</p></div></div>
+    <div class="alert-block"><span class="alert-label">ALLERGIES</span><p>{{ patient.allergies|default:'Not recorded — verify with patient'|linebreaksbr }}</p></div>
+    <div class="alert-block"><span class="alert-label">CHRONIC CONDITIONS</span><p>{{ patient.chronic_conditions|default:'None recorded'|linebreaksbr }}</p></div>
+    <div class="alert-block"><span class="alert-label">EMERGENCY CONTACT</span><p>{% if patient.emergency_contact_name %}{{ patient.emergency_contact_name }} · {{ patient.emergency_contact_phone }}{% else %}Not recorded{% endif %}</p></div>
+  </div>
+  {% endif %}
+</div>
+<div class="panel">
+  <div class="panel-heading"><div><h3>Care timeline</h3><p>Appointments and clinical notes visible to your role.</p></div><span class="soft-count">Latest appointments and notes</span></div>
+  <div class="timeline-list">
+    {% for record in records %}
+    <div class="timeline-item"><div class="timeline-mark clinical">✚</div><div class="timeline-content"><div class="timeline-meta"><strong>Clinical consultation</strong><span>{{ record.visit_date|date:'d M Y, g:i A' }}</span></div><p>{{ record.chief_complaint|default:'Consultation' }}{% if record.diagnosis %} · <strong>{{ record.diagnosis|truncatechars:100 }}</strong>{% endif %}</p><small>Dr. {{ record.doctor.user.get_full_name }}{% if record.is_sensitive %} · <span class="text-danger">Sensitive note</span>{% endif %}</small>{% if record.treatment_plan %}<div class="timeline-note">{{ record.treatment_plan|truncatechars:220 }}</div>{% endif %}{% for prescription in record.prescriptions.all %}<div class="prescription-box"><strong>Prescription</strong>{% for item in prescription.items.all %}<p>{{ item.medicine }}{% if item.dosage %} · {{ item.dosage }}{% endif %}{% if item.frequency %} · {{ item.frequency }}{% endif %}{% if item.duration %} · {{ item.duration }}{% endif %}</p>{% endfor %}</div>{% endfor %}</div></div>
+    {% endfor %}
+    {% for appointment in appointments %}
+    <div class="timeline-item"><div class="timeline-mark appointment">▣</div><div class="timeline-content"><div class="timeline-meta"><strong>{{ appointment.get_kind_display }} appointment</strong><span>{{ appointment.starts_at|date:'d M Y, g:i A' }}</span></div>{% if can_view_appointment_reason %}<p>{{ appointment.reason|default:'Consultation' }}</p>{% endif %}<small>Dr. {{ appointment.doctor.user.get_full_name }} · <span class="status-pill {{ appointment.status }}">{{ appointment.get_status_display }}</span></small></div></div>
+    {% endfor %}
+    {% if not records and not appointments %}<div class="empty-inline"><strong>No care history yet</strong><p>Appointments and clinical notes will appear here.</p></div>{% endif %}
+  </div>
+</div>
+<div class="detail-grid">
+  <div class="panel"><div class="panel-heading"><div><h3>Follow-up plan</h3><p>Open and completed care reminders.</p></div><a class="text-link" href="{% url 'followups' %}">All follow-ups →</a></div>{% for f in followups %}<div class="compact-row"><div><strong>{% if can_view_followup_title %}{{ f.title }}{% else %}Follow-up scheduled{% endif %}</strong><small>{{ f.due_date|date:'d M Y' }} · {{ f.get_priority_display }} priority</small></div><span class="status-pill {{ f.status }}">{{ f.get_status_display }}</span></div>{% empty %}<p class="muted empty-padding">No follow-ups recorded.</p>{% endfor %}</div>
+  <div class="panel"><div class="panel-heading"><div><h3>Invoices</h3><p>Recent billing history.</p></div>{% if user.role == 'clinic_manager' or user.role == 'doctor' or user.role == 'billing' or user.role == 'clinic_manager' %}<a class="text-link" href="{% url 'invoice_create' %}">New invoice →</a>{% endif %}</div>{% for invoice in invoices %}<div class="compact-row"><div><strong>{{ invoice.invoice_number }}</strong><small>{{ invoice.issue_date|date:'d M Y' }} · {{ invoice.get_status_display }}</small></div><strong>₹{{ invoice.total|floatformat:2 }}</strong></div>{% empty %}<p class="muted empty-padding">No invoices recorded.</p>{% endfor %}</div>
+</div>
+{% endblock %}

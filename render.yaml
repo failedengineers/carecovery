@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: carecovery
+    runtime: python
+    plan: free
+    buildCommand: >-
+      python -m pip install -r requirements.txt &&
+      DJANGO_DEBUG=1 DJANGO_SECRET_KEY=build-only-key-not-used-at-runtime python manage.py makemigrations crm --noinput &&
+      DJANGO_DEBUG=1 DJANGO_SECRET_KEY=build-only-key-not-used-at-runtime python manage.py collectstatic --noinput
+    startCommand: >-
+      python manage.py migrate --noinput &&
+      python manage.py merge_legacy_roles &&
+      python manage.py expire_workspaces &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 60 --access-logfile - --error-logfile -
+    healthCheckPath: /health/
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: carecovery.onrender.com
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: https://carecovery.onrender.com
+      - key: DB_SSL_REQUIRE
+        value: "1"
+      - key: DJANGO_TIME_ZONE
+        value: Asia/Kolkata
+      - key: CARE_COVERY_MAX_DOCTORS_PER_CLINIC
+        value: "50"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        value: "2525"
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: EMAIL_USE_TLS
+        value: "1"
+      - key: EMAIL_USE_SSL
+        value: "0"
+      - key: DEFAULT_FROM_EMAIL
+        sync: false

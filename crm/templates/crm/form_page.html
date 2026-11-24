@@ -1,0 +1,12 @@
+{% extends 'crm/base.html' %}{% block title %}{{ title }}{% endblock %}{% block breadcrumb %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">WORKSPACE</span><h1>{{ title }}</h1><p>{{ subtitle }}</p></div></div>
+<div class="panel form-panel"><form method="post" class="form-layout">{% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  {% for field in form %}
+    {% if field.field.widget.input_type == 'checkbox' %}<div class="form-field checkbox-field"><label for="{{ field.id_for_label }}">{{ field }}<span>{{ field.label }}</span></label>{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<em class="field-error">{{ error }}</em>{% endfor %}</div>
+    {% else %}<div class="form-field {% if field.name == 'address' or field.name == 'notes' or field.name == 'allergies' or field.name == 'chronic_conditions' or field.name == 'clinical_notes' or field.name == 'treatment_plan' or field.name == 'symptoms' or field.name == 'diagnosis' or field.name == 'examination' or field.name == 'internal_notes' or field.name == 'prescription_lines' %}form-span-2{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required-star">*</span>{% endif %}</label>{{ field }}{% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<em class="field-error">{{ error }}</em>{% endfor %}</div>{% endif %}
+  {% endfor %}
+  <div class="form-actions form-span-2">{% if cancel_pk %}<a class="btn btn-ghost" href="{% url cancel_url cancel_pk %}">Cancel</a>{% else %}<a class="btn btn-ghost" href="{% url cancel_url %}">Cancel</a>{% endif %}<button class="btn btn-primary" type="submit">{{ submit_label|default:'Save changes' }} <span>→</span></button></div>
+</form></div>
+{% endblock %}

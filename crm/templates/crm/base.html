@@ -1,0 +1,57 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6fb">
+  <title>{% block title %}Overview{% endblock %} · CareCovery</title>
+  <link rel="stylesheet" href="{% static 'crm/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark"><i>c</i></span><span class="brand-word">CareCovery<span class="brand-dot">.</span><small>CARE MANAGEMENT</small></span></a>
+    <div class="workspace-switch"><span class="workspace-icon">⌂</span><span class="workspace-name"><small>{% if user.role == 'super_admin' or user.role == 'onboarding_agent' %}PLATFORM{% else %}{{ workspace.get_account_type_display|upper }} WORKSPACE{% endif %}</small><strong>{% if workspace %}{{ workspace.name }}{% else %}Platform console{% endif %}</strong></span><span class="chevron">⌄</span></div>
+    <nav class="side-nav">
+      <p class="nav-label">{% if user.role == 'super_admin' or user.role == 'onboarding_agent' %}PLATFORM{% else %}WORKSPACE{% endif %}</p>
+      <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">◫</span> Overview</a>
+      {% if user.role == 'super_admin' or user.role == 'onboarding_agent' %}
+        <a href="{% url 'organizations' %}" class="nav-link {% if 'organization' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">▦</span> Workspaces</a>
+      {% else %}
+        <a href="{% url 'patients' %}" class="nav-link {% if request.resolver_match.url_name == 'patients' or request.resolver_match.url_name == 'patient_detail' or request.resolver_match.url_name == 'patient_create' %}active{% endif %}"><span class="nav-icon">♙</span> Patients</a>
+        <a href="{% url 'appointments' %}" class="nav-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">▣</span> Appointments</a>
+        <a href="{% url 'queue' %}" class="nav-link {% if request.resolver_match.url_name == 'queue' or request.resolver_match.url_name == 'queue_status' %}active{% endif %}"><span class="nav-icon">☷</span> Live queue</a>
+        {% if user.role != 'billing' %}<a href="{% url 'records' %}" class="nav-link {% if 'record' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">▤</span> Medical records</a>{% endif %}
+        {% if user.role != 'billing' %}<a href="{% url 'followups' %}" class="nav-link {% if 'followup' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">↗</span> Follow-ups</a>{% endif %}
+        {% if user.role != 'nurse' %}<a href="{% url 'invoice_list' %}" class="nav-link {% if 'invoice' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">₹</span> Billing</a>{% endif %}
+        <p class="nav-label nav-label-spaced">PEOPLE & INSIGHTS</p>
+        <a href="{% url 'doctors' %}" class="nav-link {% if request.resolver_match.url_name == 'doctors' %}active{% endif %}"><span class="nav-icon">⚕</span> Doctors</a>
+        {% if user.role == 'clinic_manager' %}<a href="{% url 'staff' %}" class="nav-link {% if 'staff' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">♧</span> Team & access</a>{% endif %}
+        {% if user.role == 'clinic_manager' or user.role == 'doctor' %}<a href="{% url 'reports' %}" class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}"><span class="nav-icon">▥</span> Reports</a>{% endif %}
+        {% if user.role == 'clinic_manager' or user.role == 'billing' or user.role == 'doctor' and workspace.account_type == 'individual' %}<a href="{% url 'expenses' %}" class="nav-link {% if 'expense' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">₹</span> Expenses</a>{% endif %}
+        <a href="{% url 'inventory' %}" class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}"><span class="nav-icon">▧</span> Inventory</a>
+        {% if user.role == 'clinic_manager' %}<a href="{% url 'audit_log' %}" class="nav-link {% if request.resolver_match.url_name == 'audit_log' %}active{% endif %}"><span class="nav-icon">◷</span> Activity log</a>{% endif %}
+      {% endif %}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="help-card"><div class="help-icon">✦</div><strong>Care, without the clutter.</strong><p>One calm place for the people, practice and details that matter.</p><span class="help-note">CARECO​​VERY WORKSPACE</span></div>
+      <div class="user-mini"><div class="avatar">{{ user.first_name|default:user.username|slice:':1'|upper }}</div><div class="user-mini-text"><strong>{{ user.get_full_name|default:user.username }}</strong><small>{{ user.get_role_display }}</small></div><a class="logout-mini" href="{% url 'password_change' %}" title="Change password">⚿</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-mini" type="submit" title="Sign out">↗</button></form></div>
+    </div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar"><button class="mobile-menu" id="menuToggle" aria-label="Open navigation">☰</button><div class="breadcrumb">CareCovery <span>/</span> {% block breadcrumb %}Overview{% endblock %}</div><div class="topbar-actions"><span class="date-chip">◷ <span id="todayLabel"></span></span><button class="icon-button" id="notificationToggle" title="Notifications" aria-label="Notifications">♧{% if unread_notifications %}<i class="notification-dot"></i>{% endif %}</button><div class="top-user"><div class="avatar small-avatar">{{ user.first_name|default:user.username|slice:':1'|upper }}</div><span>{{ user.first_name|default:user.username }}</span></div></div></header>
+    <section class="page-content">
+      {% if messages %}<div class="messages">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}<button type="button" onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer class="footer"><span>© {% now "Y" %} CareCovery</span><span>Built around better care.</span></footer>
+  </main>
+</div>
+<div class="notification-panel" id="notificationPanel"><div class="notification-head"><strong>Notifications</strong><span class="soft-count">{{ unread_notifications }} unread</span></div>{% for item in recent_notifications %}<div class="notification-item {% if not item.is_read %}unread{% endif %}"><div><strong>{{ item.title }}</strong><p>{{ item.message }}</p><small>{{ item.created_at|date:'d M, g:i A' }}</small></div>{% if not item.is_read %}<form method="post" action="{% url 'notification_read' item.pk %}">{% csrf_token %}<button class="tiny-link" type="submit">Mark read</button></form>{% endif %}</div>{% empty %}<p class="muted empty-padding">You're all caught up.</p>{% endfor %}</div>
+{% else %}{% block auth_content %}{% endblock %}{% endif %}
+<div class="support-actions"><a class="support-fab" href="{{ support_whatsapp_url }}" target="_blank" rel="noopener noreferrer" aria-label="Chat with CareCovery support on WhatsApp"><span class="support-fab-icon">◉</span><span>Need help? <strong>WhatsApp · {{ support_phone_display }}</strong></span></a><a class="support-call" href="tel:{{ support_phone_link }}" aria-label="Call CareCovery support">Call</a></div>
+<script src="{% static 'crm/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body></html>

@@ -1,0 +1,48 @@
+name: CareCovery CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: carecovery_test
+          POSTGRES_USER: carecovery
+          POSTGRES_PASSWORD: carecovery_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U carecovery -d carecovery_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DJANGO_DEBUG: "1"
+      DJANGO_SECRET_KEY: ci-only-not-for-deployment
+      DATABASE_URL: postgres://carecovery:carecovery_test_password@127.0.0.1:5432/carecovery_test
+      DB_SSL_REQUIRE: "0"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Generate first custom-user migration
+        run: python manage.py makemigrations crm --noinput
+      - name: Apply migrations
+        run: python manage.py migrate --noinput
+      - name: Django system check
+        run: python manage.py check
+      - name: Run tenant isolation and workflow tests
+        run: python manage.py test crm --verbosity 2

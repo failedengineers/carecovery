@@ -1,0 +1,40 @@
+{% extends 'crm/base.html' %}
+{% block title %}{{ org.name }}{% endblock %}
+{% block breadcrumb %}Workspaces / {{ org.name }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><span class="eyebrow">WORKSPACE PROFILE</span><h1>{{ org.name }}</h1><p>{{ org.get_account_type_display }} · Created {{ org.created_at|date:'d M Y' }}</p></div>
+  <div class="heading-actions"><a class="btn btn-ghost" href="{% url 'organizations' %}">← Workspaces</a><span class="status-pill {{ org.status }}">{{ org.get_status_display }}</span>
+    {% if user.role == 'super_admin' and org.status != 'suspended' %}
+    <form method="post" action="{% url 'organization_status' org.pk %}" class="inline-form">{% csrf_token %}<input type="hidden" name="status" value="suspended"><button class="btn btn-ghost" type="submit" onclick="return confirm('Suspend this workspace now? All clinic users will lose access.')">Suspend workspace</button></form>
+    {% endif %}
+  </div>
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-top"><span>Doctors</span><span class="stat-icon blue">⚕</span></div><strong>{{ doctors|length }}</strong><small>Doctor profiles in this workspace</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Patients</span><span class="stat-icon purple">♙</span></div><strong>{{ patients_count }}</strong><small>Patient profiles</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Appointments</span><span class="stat-icon green">▣</span></div><strong>{{ appointments_count }}</strong><small>All-time appointments</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Team members</span><span class="stat-icon amber">♧</span></div><strong>{{ members|length }}</strong><small>Accounts linked to workspace</small></div>
+</div>
+<div class="panel">
+  <div class="panel-heading"><div><h3>Subscription & access</h3><p>Access automatically suspends when the trial or license reaches its expiry date.</p></div><span class="role-pill">{{ org.get_subscription_kind_display }}</span></div>
+  <div class="detail-facts">
+    <div><small>ACCESS TYPE</small><strong>{{ org.get_subscription_kind_display }}</strong></div>
+    <div><small>STARTED</small><strong>{{ org.access_started_at|date:'d M Y, g:i A'|default:'Not set' }}</strong></div>
+    <div><small>EXPIRES</small><strong>{{ org.access_expires_at|date:'d M Y, g:i A'|default:'No expiry set' }}</strong></div>
+    <div><small>TIME LEFT</small><strong>{% if org.status == 'suspended' %}Suspended{% elif org.access_expires_at %}{{ org.access_days_remaining }} day{{ org.access_days_remaining|pluralize }}{% else %}Not configured{% endif %}</strong></div>
+    {% if org.suspension_reason %}<div><small>STATUS REASON</small><strong>{{ org.suspension_reason }}</strong></div>{% endif %}
+  </div>
+  {% if user.role == 'super_admin' %}
+  <div class="panel-heading" style="margin-top:20px"><div><h3>Grant or renew access</h3><p>Choose whether this is a free trial or paid license, and enter the exact duration in days.</p></div></div>
+  <form method="post" action="{% url 'organization_subscription' org.pk %}" class="form-layout">{% csrf_token %}
+    <div class="form-field"><label for="subscription_kind">Access type</label><select id="subscription_kind" name="subscription_kind" class="field-input field-select" required><option value="trial">Free trial</option><option value="license">Paid license</option></select><small class="field-help">A new grant starts immediately and replaces the current expiry date.</small></div>
+    <div class="form-field"><label for="duration_days">Duration (days)</label><input id="duration_days" name="duration_days" class="field-input" type="number" min="1" max="3650" value="30" required><small class="field-help">Enter 1 to 3650 days. Granting a paid license records access time; it does not charge a customer automatically.</small></div>
+    <div class="form-actions form-span-2"><button class="btn btn-primary" type="submit" onclick="return confirm('Grant this access period from today?')">Grant / renew access →</button></div>
+  </form>
+  {% else %}<p class="muted">Only a Super Admin can grant or renew paid licenses. Onboarding Agents can create trial accounts for a chosen duration.</p>{% endif %}
+</div>
+<div class="panel"><div class="panel-heading"><div><h3>Workspace details</h3><p>Tenant information and owner contact.</p></div></div><div class="detail-facts"><div><small>EMAIL</small><strong>{{ org.email|default:'Not set' }}</strong></div><div><small>PHONE</small><strong>{{ org.phone|default:'Not set' }}</strong></div><div><small>TIMEZONE</small><strong>{{ org.timezone }}</strong></div><div><small>ADDRESS</small><strong>{{ org.address|default:'Not set' }}</strong></div></div></div>
+<div class="panel"><div class="panel-heading"><div><h3>Members</h3><p>Clinic Manager combines clinic administration and front-desk/reception operations. Doctors keep separate patient workspaces inside this clinic.</p></div></div><div class="table-wrap"><table><thead><tr><th>NAME</th><th>ROLE</th><th>USERNAME</th><th>EMAIL</th></tr></thead><tbody>{% for member in members %}<tr><td>{{ member.get_full_name|default:member.username }}</td><td>{{ member.get_role_display }}</td><td class="mono">{{ member.username }}</td><td>{{ member.email|default:'—' }}</td></tr>{% empty %}<tr><td colspan="4" class="empty-cell">No members connected.</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="panel"><div class="panel-heading"><div><h3>Doctors</h3><p>Doctor-specific patient access is enforced within this tenant.</p></div></div><div class="doctor-grid">{% for doctor in doctors %}<div class="doctor-mini"><div class="doctor-avatar" style="--doctor-color:{{ doctor.color }}">{{ doctor.user.first_name|slice:':1'|upper }}</div><div><strong>Dr. {{ doctor.user.get_full_name }}</strong><small>{{ doctor.specialty }} · {{ doctor.primary_patients.count }} primary patients</small></div></div>{% empty %}<p class="muted">No doctor profiles yet.</p>{% endfor %}</div></div>
+{% endblock %}

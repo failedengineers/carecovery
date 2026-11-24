@@ -1,0 +1,8 @@
+{% extends 'crm/base.html' %}{% block title %}Activity log
+{% endblock %}{% block breadcrumb %}Activity log
+{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">SECURITY & ACCOUNTABILITY</span><h1>Activity log</h1><p>Recent actions recorded for this clinic workspace.</p></div></div>
+<div class="panel"><div class="panel-heading"><div><h3>Audit trail</h3><p>Latest 200 events · timestamps use the workspace timezone.</p></div></div><div class="table-wrap"><table><thead><tr><th>TIME</th><th>ACTOR</th><th>ACTION</th><th>DETAIL</th><th>IP ADDRESS</th></tr></thead><tbody>{% for log in logs %}<tr><td>{{ log.created_at|date:'d M Y, g:i A' }}</td><td>{{ log.actor.get_full_name|default:log.actor.username|default:'System' }}</td><td><span class="role-pill">{{ log.action }}</span></td><td>{{ log.description|default:'—' }}</td><td class="mono">{{ log.ip_address|default:'—' }}</td></tr>{% empty %}<tr><td colspan="5" class="empty-cell">No activity has been recorded yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% include "crm/pagination.html" %}
+{% endblock %}
